@@ -1,31 +1,54 @@
-// need hidden input field for the canvas value to be send
-
-console.log("sane");
-
 const $canvas = $("#sig-canvas"); // jQuery select element
 const canvas = $canvas[0]; // select actual html element
 const ctx = canvas.getContext("2d"); // create context
 
-var oldPosition;
+const $hiddenField = $("#hidden-field");
+const hiddenField = $hiddenField[0];
 
-$canvas.on("mousedown", (e) => {
-    console.log("click");
-    oldPosition = {
-        x: e.offsetX,
-        y: e.offsetY,
-    };
-    $canvas.on("mousemove", (e) => {
-        console.log(oldPosition);
-        ctx.beginPath();
-        ctx.moveTo(oldPosition.x, oldPosition.y);
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-        console.log("drawing");
-        console.log(e.offsetX, e.offsetY);
-        console.log(oldPosition);
-        oldPostition = {
-            x: e.offsetX,
-            y: e.offsetY,
-        };
-    });
+const $clearButton = $("#clear");
+$clearButton.on("click", () => {
+    console.log("clicked clear button");
+    hiddenField.value = "";
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
+
+// const canvas = document.getElementById("sig-canvas");
+// let ctx = canvas.getContext("2d");
+// const sigInput = document.getElementById("signature-input");
+
+canvas.addEventListener("mousedown", startDrawing);
+canvas.addEventListener("mouseup", stopDrawing);
+canvas.addEventListener("mousemove", paint);
+
+let coord = { x: 0, y: 0 };
+let draw = false;
+
+function getPosition(event) {
+    coord.x = event.clientX - canvas.getBoundingClientRect().left;
+    coord.y = event.clientY - canvas.getBoundingClientRect().top;
+}
+
+function startDrawing(event) {
+    draw = true;
+    getPosition(event);
+}
+function stopDrawing() {
+    draw = false;
+
+    let dataURL = canvas.toDataURL();
+    hiddenField.value = dataURL;
+}
+
+function paint(event) {
+    if (!draw) return;
+    ctx.beginPath();
+
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "black";
+
+    ctx.moveTo(coord.x, coord.y);
+    getPosition(event);
+    ctx.lineTo(coord.x, coord.y);
+    ctx.stroke();
+}

@@ -4,14 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
     <div class="center">
-        <h2> The last petition you will ever sign. </h2>
+        <h2 class="page-title"> The last petition you will ever sign. </h2>
+        <div class="menu">
+            {{#if loggedOut}}
+            <div class="menu-item"><a href="/register">Register</a></div>
+            <div class="menu-item">|</div>
+            <div class="menu-item"><a href="/login">Login</a></div>
+            {{/if}}
 
+            {{#if loggedIn}}
+            <div class="menu-item"><a href="/signers">Co-Signers</a></div>
+            <div class="menu-item">|</div>
+            <div class="menu-item"><a href="/logout">Logout</a></div>
+            {{/if}}
+        </div> 
+        <div class="center body">
         {{{body}}}
-    </div>
+        </div>
 </body>
 <footer class="footer"> © 2020 Marian Heidbreder - mail@marianheidbreder.de</footer>
 </html>

@@ -1,20 +1,22 @@
-<div class="center">
-    <div class="container">
-        blabla
-        <form action="/petition" method="POST">
-        <div>
-            <label for="first">First name:</label>
-            <input name="first" type="text" id="first"> 
-        </div>
-        <div>
-            <label for="last">First name:</label>
-            <input name="last" type="text" id="last">
-        </div>
-        <div>
-            <canvas id="sig-canvas"></canvas>
-        </div>
-            will be hidden later:<input name="sig" type="text" id="sig">
-            <input name="sign" type="submit" value="sign" id="sign">
-        </form>
+<div >
+    <div class="top-down">
+        <div class="hero-text">End petitions once and for all.</div>
+        <div id="cta">Sign now!</div>
     </div>
+        <form action="/petition" method="POST">
+        <div class="center">
+            <div class="margin">
+                <canvas width="490px" id="sig-canvas"></canvas>
+                    <div class="row">
+                    <div id="your-sig">your signature here</div>
+                    <div id="clear">X</div>
+                    </div>
+                </div>
+        </div>
+        <div class="center">
+
+            <input name="sign" type="submit" value="Signed" id="sign">
+        </div>
+                    <input name="sig" type="text" id="hidden-field">
+        </form>
 </div>

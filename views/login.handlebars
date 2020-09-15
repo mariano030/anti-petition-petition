@@ -1,0 +1,27 @@
+<div>
+    <h2 class="hero-text">Login now!</h2>
+
+    <div class="container">
+        {{#if error}}
+    <div class="error-text">Oh no, something went wrong! Please try again!</div>
+    {{/if}}
+        <form method="POST">
+
+        <div>
+            <label for="email">Email Address</label>
+            <input type="text" id="email" label="email" name="email" autofocus>
+        </div>
+
+        <div>
+            <label for="password">Pasword</label>
+            <input type="text" id="password" label="password"  name="password">
+        
+        </div>
+
+        <div>
+            <input type="submit" value="login" id="login-button">
+        
+        </div>
+            </form>
+    </div>
+</div>

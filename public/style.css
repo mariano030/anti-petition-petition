@@ -9,10 +9,181 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+}
+
+.menu {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.menu-item {
+    margin: 5px;
+    letter-spacing: 0.3em;
+    font-size: 1em;
 }
 
 #sig-canvas {
     border: 1px solid black;
-    width: 350px;
-    height: 80px;
+}
+
+.flex-column {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+img {
+    height: 110px;
+}
+
+.footer {
+    position: absolute;
+    top: 98vh;
+    font-size: 0.7em;
+    padding: 0px 6px;
+}
+
+.body {
+    height: 70vh;
+    align-items: flex-start;
+}
+
+h2 {
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    padding: 40px 0px 5px 0px;
+    font-weight: 100;
+}
+
+.page-title {
+    color: white;
+}
+
+#thanks {
+    text-transform: uppercase;
+    /* letter-spacing: 0.4em; */
+
+    font-weight: 900;
+    font-size: 7em;
+}
+
+#cta {
+    text-transform: uppercase;
+    /* letter-spacing: 0.4em; */
+
+    font-weight: 900;
+    font-size: 8em;
+}
+
+#sign {
+    text-transform: uppercase;
+    /* letter-spacing: 0.4em; */
+
+    font-weight: 900;
+    font-size: 4em;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.signature {
+    margin: 20px;
+    border: 1px black solid;
+    display: flex;
+    justify-content: center;
+}
+
+.label {
+    padding: 0px 40px 0px 0px;
+}
+
+.hero-text {
+    font-weight: 600;
+    font-size: 2.8em;
+    text-transform: uppercase;
+}
+
+.smaller {
+    font-size: 1.93em;
+}
+
+.container {
+    width: 500px;
+}
+
+input {
+    border: 1px black solid;
+    width: 100%;
+}
+
+#co-signers {
+    letter-spacing: 0.8em;
+    font-weight: 200;
+    font-size: 2.4;
+}
+
+ul {
+    list-style: none outside none;
+    text-transform: uppercase;
+}
+
+li {
+    padding: 7px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.error-text {
+    color: white;
+    letter-spacing: 0.5em;
+    font-size: 1.4em;
+    margin: 10px;
+}
+
+#clear {
+    text-align: right;
+    cursor: pointer;
+    width: 48%;
+}
+
+#yoursig {
+    text-align: left;
+    cursor: pointer;
+    width: 48%;
+}
+
+#hidden-field {
+    visibility: hidden;
+}
+
+.top-down {
+    display: flex;
+    flex-direction: column;
+}
+
+.margin {
+    margin: 20px;
+}
+
+.vertical {
+    width: 80vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.text-box {
+    width: 490px;
 }

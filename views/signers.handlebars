@@ -1,0 +1,27 @@
+<div class="center flex-column">
+
+<div class="hero-text"> Co-Signers: </div>
+
+<ul>
+{{#each signersInfos}}
+
+    <li>
+        {{#if users_url}}
+        
+            <a href='{{users_url}}'>{{users_first}} {{users_last}}</a>
+        
+        {{else}}
+        
+            {{users_first}} {{users_last}}
+
+        {{/if}}
+        {{#if users_age}}
+, {{users_age}}
+        {{/if}} 
+        {{#if users_city}}
+        , from <a href='/cities/{{users_city}}'>{{users_city}}  </a>
+        {{/if}}</li>
+{{/each}}
+</ul>
+
+</div>

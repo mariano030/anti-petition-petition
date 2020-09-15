@@ -1,0 +1,43 @@
+<div>
+    <h2 class="hero-text">Register now!</h2>
+
+    <div class="container">
+        <form method="POST">
+
+        <div>
+            <label for="first">First Name</label>
+            <input type="text" id="first" name="first" label="first" autofocus>
+        </div>
+        
+        <div>
+            <label for="last">Last Name</label>
+            <input type="text" id="last" name="last" label="last">
+        </div>
+
+        <div>
+            <label for="email">Email Address</label>
+            <input type="text" id="email" name="email" label="email@address">
+        </div>
+
+        <div>
+            <label for="password">Pasword</label>
+            <input type="password" id="password" name="password" label="password">
+        
+        </div>
+
+        <div>
+            <input type="submit" value="register now" id="register-button">
+        
+        </div>
+            </form>
+    </div>
+    {{#if error}}
+    <div class="error-text">Oh no, something went wrong! Please try again.</div>
+    <div class="error">
+        <video width="320" height="240" loop>
+  <source src="https://media.giphy.com/media/XG1ycNo33Yd53lT7th/giphy.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+    </div>
+    {{/if}}
+</div>

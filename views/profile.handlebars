@@ -1,0 +1,36 @@
+<div class="vertical">
+    <div class="hero-text">
+        Please provide further information for your user profile (optional)
+    </div>
+
+        <div class="container">
+            <form method="POST">
+
+            <div>
+                <label for="age">my age</label>
+                <input type="text" id="age" label="age" name="age">
+            
+            </div>
+
+            <div>
+                <label for="city">my city</label>
+                <input type="text" id="city" label="city" name="city">
+            </div>
+
+            <div>
+                <label for="age">my homepage's url</label>
+                <input type="text" id="url" label="url" name="url">
+            
+            </div>
+
+            <div>
+                <input type="submit" value="complete profile" id="submit">
+            
+            </div>
+                </form>
+        </div>
+            {{#if error}}
+        <div class="error-text">Oh no! Something went wrong! Please try again!</div>
+            {{/if}}
+
+    </div>
