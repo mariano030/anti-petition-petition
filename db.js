@@ -1,6 +1,9 @@
 const spicedPg = require("spiced-pg");
 
-const db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
+const db = spicedPg(
+    process.env.DATABASE_URL ||
+        "postgres:postgres:postgres@localhost:5432/petition"
+);
 
 module.exports.createUser = (first, last, email, password) => {
     const q = `
@@ -85,12 +88,51 @@ module.exports.getSignersByCity = (city) => {
 
 module.exports.getUsersProfileData = (user_id) => {
     const q = `
-    SELECT users.id, users.first AS users_first, users.last AS users_last, user_profiles.city AS users_city, user_profiles.age AS users_age, user_profiles.url AS users_url
+    SELECT users.id, users.first AS users_first, users.last AS users_last, users.email AS users_email, user_profiles.city AS users_city, user_profiles.age AS users_age, user_profiles.url AS users_url
     FROM users 
     LEFT JOIN user_profiles
     ON users.id = user_profiles.user_id
-    WHERE users.id = 12
+    WHERE users.id = $1
     `;
     const params = [user_id];
+    return db.query(q, params);
+};
+
+module.exports.updateUsersData = (
+    users_id,
+    users_first,
+    users_last,
+    users_email,
+    users_pwHashed
+) => {
+    const q = `
+    UPDATE users
+    SET first = $2, last = $3, email = $4, password = $5
+    WHERE id = $1;
+    `;
+    const params = [
+        users_id,
+        users_first,
+        users_last,
+        users_email,
+        users_pwHashed,
+    ];
+    return db.query(q, params);
+};
+
+module.exports.updateUsersProfile = (
+    users_age,
+    users_city,
+    users_url,
+    users_id
+) => {
+    const q = `
+    INSERT INTO user_profiles (age, city, url, user_id)
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT (user_id)
+    DO UPDATE SET age = $1, city = $2, url = $3;
+    `;
+
+    const params = [users_age, users_city, users_url, users_id];
     return db.query(q, params);
 };

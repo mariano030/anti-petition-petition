@@ -2,17 +2,17 @@
 
         <div>
             <label for="first">First Name</label>
-            <input type="text" id="first" name="first" label="first" autofocus>
+            <input type="text" id="first" name="first" label="first" value="{{user_profile.users_first}}" autofocus>
         </div>
         
         <div>
             <label for="last">Last Name</label>
-            <input type="text" id="last" name="last" label="last">
+            <input type="text" id="last" name="last" label="last" value="{{user_profile.users_last}}" >
         </div>
 
         <div>
             <label for="email">Email Address</label>
-            <input type="text" id="email" label="email" name="email" autofocus>
+            <input type="text" id="email" label="email" name="email"  value="{{user_profile.users_email}}" >
         </div>
 
         <div>
@@ -23,23 +23,23 @@
 
             <div>
                 <label for="age">Age</label>
-                <input type="text" id="age" label="age" name="age">
+                <input type="text" id="age" label="age" name="age"  value="{{user_profile.users_age}}" >
             
             </div>
 
             <div>
                 <label for="city">City of residence</label>
-                <input type="text" id="city" label="city" name="city">
+                <input type="text" id="city" label="city" name="city"  value="{{user_profile.users_city}}" >
             </div>
 
             <div>
                 <label for="age">Your homepage's url</label>
-                <input type="text" id="url" label="url" name="url">
+                <input type="text" id="url" label="url" name="url"  value="{{user_profile.users_url}}" >
             
             </div>
-
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <div>
-                <input type="submit" value="complete profile" id="submit">
+                <input type="submit" value="update my profile" id="submit">
             
             </div>
                 </form>

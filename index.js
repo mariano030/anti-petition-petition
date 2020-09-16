@@ -12,9 +12,13 @@ app.set("view engine", "handlebars");
 //// MIDDLEWARE ''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 app.use(require("cookie-parser")());
+///
+const csurf = require("csurf");
+
 app.use(express.static("public"));
 
 app.use(
+    // what does that do again???
     express.urlencoded({
         extended: false,
     })
@@ -29,6 +33,13 @@ app.use(
         maxAge: 1000 * 60 * 60 * 24 * 14,
     })
 );
+///
+app.use(csurf());
+
+app.use(function (req, res, next) {
+    res.locals.csrfToken = req.csrfToken(); // make csurf token available for every route
+    next();
+});
 
 app.use(function (req, res, next) {
     console.log("### sreq.url/ session ", req.url, req.session);
@@ -216,6 +227,43 @@ app.post("/login", (req, res) => {
     // logout route?? - set cookie session to null
 });
 
+app.post("/edit", (req, res) => {
+    hash(req.body.password).then((hashedPw) => {
+        db.updateUsersData(
+            req.session.id,
+            req.body.first,
+            req.body.last,
+            req.body.email,
+            hashedPw
+        )
+            .then(() => {
+                console.log(req.body);
+                db.updateUsersProfile(req.body.age, req.body);
+                res.render("edit", { user_profile: editData, loggedIn: true });
+            })
+            .catch((err) => {
+                console.log(err);
+                db.getUsersProfileData(req.session.id)
+                    .then((result) => {
+                        console.log(result.rows[0]);
+                        res.render("edit", {
+                            user_profile: result.rows[0],
+                            loggedIn: true,
+                            loggedOut: false,
+                        });
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        res.render("edit", {
+                            user_profile: result.rows[0],
+                            loggedIn: true,
+                            error: err,
+                        });
+                    });
+            });
+    });
+});
+
 app.post("/petition", (req, res) => {
     /* 
     redirects to /thanks if there is a cookie
@@ -328,10 +376,6 @@ app.get("/thanks", (req, res) => {
     render thanks.handlebars
 
     */
-    //console.log("getting the cities");
-    //db.getCities().then((results) => {
-    //    console.log("results: ", results);
-    //});
 });
 
 app.get("/signers", (req, res) => {
@@ -358,21 +402,30 @@ app.get("/signers", (req, res) => {
         .catch((err) => console.log(err));
 });
 
+//let editData = {};
+
 app.get("/edit", (req, res) => {
-    db.getUsersProfileData(12)
-        .then((result) => {
-            console.log(result);
-            res.render("edit", {
-                user_profile: result,
+    if (req.session.id) {
+        db.getUsersProfileData(req.session.id)
+            .then((result) => {
+                console.log(result.rows[0]);
+                editData = result.rows[0];
+                res.render("edit", {
+                    user_profile: result.rows[0],
+                    loggedIn: true,
+                    loggedOut: false,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+                res.render("edit", {
+                    loggedIn: true,
+                    error: err,
+                });
             });
-        })
-        .catch((err) => {
-            console.log(err);
-            res.render("edit", {
-                isLoggedIn: true,
-                error: err,
-            });
-        });
+    } else {
+        res.redirect("/register");
+    }
 });
 
 app.get("/logout", (req, res) => {
