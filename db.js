@@ -80,5 +80,17 @@ module.exports.getSignersInfo = () => {
 
 module.exports.getSignersByCity = (city) => {
     const q = `
-    SELECT `;
+    SELECT `; /////// ## WIP
+};
+
+module.exports.getUsersProfileData = (user_id) => {
+    const q = `
+    SELECT users.id, users.first AS users_first, users.last AS users_last, user_profiles.city AS users_city, user_profiles.age AS users_age, user_profiles.url AS users_url
+    FROM users 
+    LEFT JOIN user_profiles
+    ON users.id = user_profiles.user_id
+    WHERE users.id = 12
+    `;
+    const params = [user_id];
+    return db.query(q, params);
 };

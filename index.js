@@ -23,7 +23,9 @@ app.use(
 //// SESSION MIDDLEWARE
 app.use(
     cookieSession({
-        secret: `The fat is in the fire, a fryer made of chicken wire.`,
+        secret:
+            process.env.SESSION_SECRET ||
+            `The fat is in the fire, a fryer made of chicken wire.`,
         maxAge: 1000 * 60 * 60 * 24 * 14,
     })
 );
@@ -271,7 +273,7 @@ app.get("/petition", (req, res) => {
                     loggedIn: true,
                 });
             }
-            // res.redirect("/thanks");
+            //res.redirect("/thanks");
             // did the person sign already???
         })
         .catch(() => {
@@ -354,43 +356,23 @@ app.get("/signers", (req, res) => {
             });
         })
         .catch((err) => console.log(err));
-    // const signatureId = req.session.id;
-    // const signersFullNames = [];
-    // console.log("signers served");
-    // let allSigners = [];
-    // db.getSigners()
-    //     .then((results) => {
-    //         console.log(results.rows);
-    //         for (element in results.rows) {
-    //             let firstName = results.rows[element].first;
-    //             let lastName = results.rows[element].last;
-    //             let fullName = firstName + " " + lastName;
-    //             allSigners.push(fullName);
-    //         }
-    //         console.log(allSigners);
-    //     })
-    //     .catch((err) => {
-    //         console.log(err);
-    //     });
+});
 
-    // .then((allSigners) => {
-    //         //console.log(results);
-    //         console.log(allSigners.rows[0]);
-    //         for (let signer of allSigners.rows) {
-    //             let fullName = signer.first + " " + signer.last;
-    //             signersFullNames.push(fullName);
-    //         }
-    //         console.log(signersFullNames);
-    //         res.render("signers", {
-    //             layout: "main",
-    //             name: signersFullNames,
-    //         });
-    //     })
-    //     .catch((err) => {
-    //         console.log("an error occured ", err);
-    //         // dunno if this is necessary
-    //         res.redirect("/petition");
-    //     });
+app.get("/edit", (req, res) => {
+    db.getUsersProfileData(12)
+        .then((result) => {
+            console.log(result);
+            res.render("edit", {
+                user_profile: result,
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.render("edit", {
+                isLoggedIn: true,
+                error: err,
+            });
+        });
 });
 
 app.get("/logout", (req, res) => {
@@ -401,7 +383,9 @@ app.get("/logout", (req, res) => {
     });
 });
 
-app.listen(3000, () => console.log("petition up and runing"));
+app.listen(process.env.PORT || 3000, () =>
+    console.log("~~~~~~~~~~ petition up and runing ~~~~~~~~~~")
+);
 
 //         req.on("data", (chunk) => {
 //             body += chunk;
@@ -416,3 +400,8 @@ app.listen(3000, () => console.log("petition up and runing"));
 // wili mentioned a db querry count (or smth) for the number of co-signers
 
 // what are we going to build?!
+
+/////////////////////
+// is user logged in?
+
+// has user signed already?
