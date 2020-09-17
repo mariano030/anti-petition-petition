@@ -81,9 +81,18 @@ module.exports.getSignersInfo = () => {
     return db.query(q);
 };
 
-module.exports.getSignersByCity = (city) => {
+module.exports.getSignersInfoByCity = (city) => {
     const q = `
-    SELECT `; /////// ## WIP
+    SELECT users.first AS users_first, users.last AS users_last, user_profiles.city AS users_city, user_profiles.age AS users_age, user_profiles.url AS users_url
+    FROM user_profiles
+    INNER JOIN signatures
+    ON user_profiles.user_id = signatures.user_id
+    JOIN users
+    ON signatures.user_id = users.id
+    WHERE LOWER(user_profiles.city) =LOWER($1)
+    `;
+    const params = [city];
+    return db.query(q, params);
 };
 
 module.exports.getUsersProfileData = (user_id) => {
@@ -98,25 +107,27 @@ module.exports.getUsersProfileData = (user_id) => {
     return db.query(q, params);
 };
 
-module.exports.updateUsersData = (
+module.exports.updateUsersDataNoPw = (
     users_id,
     users_first,
     users_last,
-    users_email,
-    users_pwHashed
+    users_email
 ) => {
     const q = `
     UPDATE users
-    SET first = $2, last = $3, email = $4, password = $5
+    SET first = $2, last = $3, email = $4
     WHERE id = $1;
     `;
-    const params = [
-        users_id,
-        users_first,
-        users_last,
-        users_email,
-        users_pwHashed,
-    ];
+    const params = [users_id, users_first, users_last, users_email];
+    return db.query(q, params);
+};
+
+module.exports.updateUsersPw = (user_id, hashedPw) => {
+    const q = `
+    UPDATE users
+    SET password = $2
+    WHERE id =$1`;
+    const params = [user_id, hashedPw];
     return db.query(q, params);
 };
 

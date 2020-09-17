@@ -70,6 +70,6 @@ app.use(function (req, res, next) {
 
 // restart heroku form website - restart all dynos -
 
-data.heroku.com;
+// data.heroku.com;
 
-\x;
+// postgres: \x;

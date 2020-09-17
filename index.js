@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("./db");
 const { compare, hash } = require("./bc");
 const app = express();
+exports.app = app;
 const cookieSession = require("cookie-session");
 
 // HANDLEBARS SETUP
@@ -33,7 +34,7 @@ app.use(
         maxAge: 1000 * 60 * 60 * 24 * 14,
     })
 );
-///
+/// security middleware
 app.use(csurf());
 
 app.use(function (req, res, next) {
@@ -41,6 +42,12 @@ app.use(function (req, res, next) {
     next();
 });
 
+app.use(function (req, res, next) {
+    res.set("x-frame-options", "DENY");
+    next();
+});
+
+// info middleware
 app.use(function (req, res, next) {
     console.log("### sreq.url/ session ", req.url, req.session);
     next();
@@ -120,7 +127,7 @@ app.get("/register", (req, res) => {
         });
         return;
     } else {
-        res.redirect("/thanks");
+        res.redirect("/petition");
     }
 });
 
@@ -228,81 +235,124 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/edit", (req, res) => {
-    hash(req.body.password).then((hashedPw) => {
-        db.updateUsersData(
+    console.log(
+        req.session.id,
+        req.body.first,
+        req.body.last,
+        req.body.email,
+        req.body.password,
+        //hashedPw,
+        req.body.age,
+        req.body.city,
+        req.body.url
+    );
+    const updatePromises = [];
+    if (req.body.password == "") {
+        console.log("no change to password");
+    } else {
+        console.log("change password");
+        hash(req.body.password)
+            .then((hashedPw) => {
+                updatePromises.push(db.updateUsersPw(req.session.id, hashedPw));
+            })
+            .catch((err) => console.log(err));
+    }
+    console.log(
+        "all data for UsersDataNoPw",
+        req.session.id,
+        req.body.first,
+        req.body.last,
+        req.body.email
+    );
+    // update users without pw
+    updatePromises.push(
+        db.updateUsersDataNoPw(
             req.session.id,
             req.body.first,
             req.body.last,
-            req.body.email,
-            hashedPw
+            req.body.email
         )
-            .then(() => {
-                console.log(req.body);
-                db.updateUsersProfile(req.body.age, req.body);
-                res.render("edit", { user_profile: editData, loggedIn: true });
+    );
+    console.log(
+        "all data for UsersProfile",
+        req.body.age,
+        req.body.city,
+        req.body.url,
+        req.session.id
+    );
+    // update user_profiles
+    updatePromises.push(
+        db.updateUsersProfile(
+            req.body.age,
+            req.body.city,
+            req.body.url,
+            req.session.id
+        )
+    );
+    Promise.all(updatePromises)
+        .then((result) => res.redirect("/signers"))
+        .catch((err) => {
+            console.log("schon wieder ein error", err);
+        });
+});
+// hash(req.body.password).then((hashedPw) => {
+//     db.updateUsersData(
+//         req.session.id,
+//         req.body.first,
+//         req.body.last,
+//         req.body.email,
+//         hashedPw
+//     )
+//         .then(() => {
+//             console.log(req.body);
+//             db.updateUsersProfile(req.body.age, req.body);
+//             res.render("edit", { user_profile: editData, loggedIn: true });
+//         })
+//         .catch((err) => {
+//             console.log(err);
+//             db.getUsersProfileData(req.session.id)
+//                 .then((result) => {
+//                     console.log(result.rows[0]);
+//                     res.render("edit", {
+//                         user_profile: result.rows[0],
+//                         loggedIn: true,
+//                         loggedOut: false,
+//                     });
+//                 })
+//                 .catch((err) => {
+//                     console.log(err);
+//                     res.render("edit", {
+//                         user_profile: result.rows[0],
+//                         loggedIn: true,
+//                         error: err,
+//                     });
+//                 });
+//         });
+// });
+
+app.post("/petition", (req, res) => {
+    // check if signed
+    if (req.body.sig == "") {
+        console.log("no signature");
+    } else {
+        // add sig for signed to session...
+        req.session.sig = true;
+        db.addSignature(req.body.sig, req.session.id)
+            .then((result) => {
+                //console.log("results.rows", results.rows);
+                //console.log("result...id", result.rows[0].id);
+                console.log("a user signed!");
+                // is this even necessary req.session.id = result.rows[0].id;
+                //res.cookie()
+                console.log("do we even get here?");
+                res.redirect("/thanks");
             })
             .catch((err) => {
                 console.log(err);
-                db.getUsersProfileData(req.session.id)
-                    .then((result) => {
-                        console.log(result.rows[0]);
-                        res.render("edit", {
-                            user_profile: result.rows[0],
-                            loggedIn: true,
-                            loggedOut: false,
-                        });
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        res.render("edit", {
-                            user_profile: result.rows[0],
-                            loggedIn: true,
-                            error: err,
-                        });
-                    });
+                console.log("oooh, so this happens then???!");
+                res.redirect("/signers");
             });
-    });
-});
-
-app.post("/petition", (req, res) => {
-    /* 
-    redirects to /thanks if there is a cookie
-    do insert of submitted data into database
-    if there is an error, petition.handlebars is rendered with an error message
-    if there is no error
-        sets cookie to remember
-        redirects to thank you page
-
-    */
-    //res.render("petition");
-    console.log("post ist da!");
-    console.log(req.body);
-    // actually I think this is supposed to be a .catch thingy
-    // if (
-    //     // req.body.first.length <= 1 ||
-    //     //req.body.last.length <= 1 ||
-    //     //req.body.sig.length <= 1
-    // ) {
-    //     console.log("error, der user versucht uns zu bescheißen");
-    //     //res.render("TRY AND FOOL SOMEONE ELSE,  PLEASE");
-    // } else {
-    //console.log("req.body.session.id", req.body.session.id);
-    console.log("req.session.id", req.session.id);
-    db.addSignature(req.body.sig, req.session.id)
-        .then((result) => {
-            //console.log("results.rows", results.rows);
-            //console.log("result...id", result.rows[0].id);
-            console.log("a user signed!");
-            // is this even necessary req.session.id = result.rows[0].id;
-            //res.cookie()
-            console.log("do we even get here?");
-            res.redirect("/thanks");
-        })
-        .catch((err) => {
-            console.log(err);
-            console.log("oooh, so this happens then???!");
-            res.redirect("/signers");
-        });
+    }
 });
 
 app.get("/profile", (req, res) => {
@@ -428,6 +478,24 @@ app.get("/edit", (req, res) => {
     }
 });
 
+// dynamic route using route parameters
+app.get("/signers/:city", (req, res) => {
+    console.log("starting getSignersInfoByCity now...");
+    db.getSignersInfoByCity(req.params.city)
+        .then((result) => {
+            console.log(result.rows);
+            const signersInfos = result.rows;
+            res.render("signers", {
+                signersInfos,
+                loggedIn: true,
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.redirect("/signers");
+        });
+});
+
 app.get("/logout", (req, res) => {
     req.session = null;
     res.render("logged-out", {
@@ -436,9 +504,11 @@ app.get("/logout", (req, res) => {
     });
 });
 
-app.listen(process.env.PORT || 3000, () =>
-    console.log("~~~~~~~~~~ petition up and runing ~~~~~~~~~~")
-);
+if (require.main == module) {
+    app.listen(process.env.PORT || 3000, () =>
+        console.log("~~~~~~~~~~ petition up and runing ~~~~~~~~~~")
+    );
+}
 
 //         req.on("data", (chunk) => {
 //             body += chunk;
