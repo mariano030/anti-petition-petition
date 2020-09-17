@@ -141,7 +141,8 @@ module.exports.updateUsersProfile = (
     INSERT INTO user_profiles (age, city, url, user_id)
     VALUES ($1, $2, $3, $4)
     ON CONFLICT (user_id)
-    DO UPDATE SET age = $1, city = $2, url = $3;
+    DO UPDATE SET age = $1, city = $2, url = $3
+    WHERE user_profiles.user_id = $4
     `;
 
     const params = [users_age, users_city, users_url, users_id];
