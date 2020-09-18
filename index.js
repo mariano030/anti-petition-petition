@@ -262,7 +262,9 @@ app.post("/edit", (req, res) => {
         req.session.id,
         req.body.first,
         req.body.last,
-        req.body.email
+        req.body.email,
+        req.body.age,
+        req.body.city
     );
     // update users without pw
     updatePromises.push(
@@ -281,12 +283,14 @@ app.post("/edit", (req, res) => {
         req.session.id
     );
     // update user_profiles
+    console.log("updating user_profile");
+    const user_id = req.session.id;
     updatePromises.push(
         db.updateUsersProfile(
             req.body.age,
             req.body.city,
             req.body.url,
-            req.session.id
+            user_id
         )
     );
     Promise.all(updatePromises)
