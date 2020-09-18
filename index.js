@@ -62,6 +62,10 @@ app.get("/public", (res, req) => {
     console.log("public served, make static though");
 });
 
+app.get("/", (res, req) => {
+    res.redirect("/register");
+});
+
 app.post("/register", (req, res) => {
     // req.
     // get user info from req.
