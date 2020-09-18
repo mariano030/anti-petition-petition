@@ -5,6 +5,13 @@ const app = express();
 exports.app = app;
 const cookieSession = require("cookie-session");
 
+const {
+    requireLoggedInUser,
+    requireLoggedOutUser,
+    requireNoSignature,
+    requireSignature,
+} = require("./middleware"); // secure cookies weiterhin hier in index.js
+
 // HANDLEBARS SETUP
 const hb = require("express-handlebars");
 app.engine("handlebars", hb());
@@ -53,31 +60,23 @@ app.use(function (req, res, next) {
     next();
 });
 
+// cookiecheck middlware
+app.use(requireLoggedInUser);
+
 //// VARIABLES
 let body = "";
 
 //// ROUTES -----------------------------------------------------------
 
 app.get("/public", (res, req) => {
-    console.log("public served, make static though");
+    console.log("public served, made static though");
 });
 
-app.get("/", (res, req) => {
+app.get("/", (req, res) => {
     res.redirect("/register");
 });
 
-app.post("/register", (req, res) => {
-    // req.
-    // get user info from req.
-    // hash password
-    // store user information in db - return id
-    // create session with user id
-    // redirect to /petition if hasing and db INSERT
-    //
-    // in case of error: redirect to /register or re-render with error message! {{#if errorx}}
-    if (req.session && req.session.id) {
-        res.redirect("/thanks");
-    }
+app.post("/register", requireLoggedOutUser, (req, res) => {
     console.log("req.body.email", req.body.email);
     console.log("req.body.first", req.body.first);
     console.log("req.body.last", req.body.last);
@@ -123,16 +122,16 @@ app.post("/register", (req, res) => {
     //     );
 });
 
-app.get("/register", (req, res) => {
-    if (!req.session.id) {
-        console.log("req.session.id present:", req.session.id);
-        res.render("register", {
-            loggedOut: true,
-        });
-        return;
-    } else {
-        res.redirect("/petition");
-    }
+app.get("/register", requireLoggedOutUser, (req, res) => {
+    // if (!req.session.id) {
+    //     console.log("req.session.id present:", req.session.id);
+    //     res.render("register", {
+    //         loggedOut: true,
+    //     });
+    //     return;
+    // } else {
+    res.redirect("/petition");
+    // }
 });
 
 app.post("/profile", (req, res) => {
@@ -164,6 +163,7 @@ app.post("/profile", (req, res) => {
 app.get("/login", (req, res) => {
     if (req.session.id) {
         res.redirect("/petition");
+        return;
     }
     res.render("login", {
         loggedOut: true,
@@ -369,7 +369,7 @@ app.get("/profile", (req, res) => {
     });
 });
 
-app.get("/petition", (req, res) => {
+app.get("/petition", requireNoSignature, (req, res) => {
     db.getSignatureByUserId(req.session.id)
         .then((result) => {
             console.log("RESULTTT", result);
@@ -383,7 +383,7 @@ app.get("/petition", (req, res) => {
             // did the person sign already???
         })
         .catch(() => {
-            console.log("petition get served");
+            console.log("petition gets served");
             res.render("thanks", {
                 layout: "script",
                 loggedIn: true,
@@ -436,7 +436,7 @@ app.get("/thanks", (req, res) => {
     */
 });
 
-app.get("/signers", (req, res) => {
+app.get("/signers", requireSignature, (req, res) => {
     /*
     
     redirects to /petition if there is no cookie
